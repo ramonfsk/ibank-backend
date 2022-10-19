@@ -30,8 +30,10 @@ func (th *TransactionHandler) makeTransaction(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 	} else {
 		// make transaction
-		action := c.Param("create")
-		if action == "create" {
+		action := c.Param("action")
+		if action == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		} else if action == "/create" {
 			transaction, appErr := th.service.MakeTransaction(request)
 			if appErr != nil {
 				c.AbortWithStatusJSON(appErr.Code, appErr.AsMessage())

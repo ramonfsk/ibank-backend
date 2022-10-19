@@ -21,7 +21,7 @@ func Start() {
 	router.GET("/users", uh.getAllUsers)
 	router.GET("/users/:id", uh.getUser)
 	router.POST("/users/:id/account", ah.newAccount)
-	router.POST("/transactions/*create", th.makeTransaction)
+	router.POST("/transactions/*action", th.makeTransaction)
 	router.POST("/transactions", th.makeTransaction)
 	// starting server
 	router.Run(":8000")
