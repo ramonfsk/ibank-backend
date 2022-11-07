@@ -3,6 +3,7 @@ package domain
 import (
 	"github.ibm.com/rfnascimento/ibank/server/dto"
 	"github.ibm.com/rfnascimento/ibank/server/errs"
+	"github.ibm.com/rfnascimento/ibank/server/utils"
 )
 
 type Account struct {
@@ -18,7 +19,8 @@ type Account struct {
 }
 
 type AccountRepository interface {
-	Save(Account) (*Account, *errs.AppError)
+	FindAll(string) ([]Account, *errs.AppError)
+	FindByID(string) (*Account, *errs.AppError)
 }
 
 func (a Account) Validate() *errs.AppError {
@@ -33,7 +35,21 @@ func (a Account) CanWithdraw(value float64) bool {
 	return a.Balance >= value
 }
 
-func (a Account) ToDTO() dto.NewAccountResponse {
+func (a Account) ToDTO() dto.AccountResponse {
+	return dto.AccountResponse{
+		ID:          a.ID,
+		UserID:      a.UserID,
+		OpeningDate: a.OpeningDate,
+		Agency:      a.Agency,
+		Number:      a.Number,
+		CheckDigit:  a.CheckDigit,
+		PIN:         a.PIN,
+		Balance:     a.Balance,
+		Status:      utils.StatusAsText(a.Status),
+	}
+}
+
+func (a Account) ToDTONewAccount() dto.NewAccountResponse {
 	return dto.NewAccountResponse{
 		Agency:        a.Agency,
 		NumberAccount: a.Number,

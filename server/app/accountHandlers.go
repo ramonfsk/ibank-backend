@@ -14,15 +14,26 @@ type AccountHandler struct {
 }
 
 func (ah *AccountHandler) getAllAccounts(c *gin.Context) {
-	// TODO:
+	status := c.Query("status")
+	users, err := ah.service.GetAllAccounts(status)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadGateway, err.AsMessage())
+	} else {
+		c.JSON(http.StatusOK, users)
+	}
 }
 func (ah *AccountHandler) getAccount(c *gin.Context) {
 	regex, _ := regexp.Compile(`[0-9]+`)
 
-	userID := c.Param(`id_account`)
-	if !regex.MatchString(userID) {
-		c.AbortWithStatusJSON(http.StatusBadRequest, (&errs.AppError{Message: `invalid id`}).AsMessage())
+	id := c.Param("id_account")
+	if !regex.MatchString(id) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, (&errs.AppError{Message: "invalid id"}).AsMessage())
 	} else {
-		// TODO:
+		user, err := ah.service.GetAccount(id)
+		if err != nil {
+			c.JSON(http.StatusBadGateway, err.AsMessage())
+		}
+
+		c.JSON(http.StatusOK, user)
 	}
 }

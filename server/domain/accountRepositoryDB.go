@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"database/sql"
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
@@ -12,32 +13,42 @@ type AccountRepositoryDB struct {
 	client *sqlx.DB
 }
 
-func (d AccountRepositoryDB) Save(a Account) (*Account, *errs.AppError) {
-	result, err := d.client.Exec(`INSERT INTO account (user_id, opening_date, agency, number, check_digit, pin, balance, status) 
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		a.UserID,
-		a.OpeningDate,
-		a.Agency,
-		a.Number,
-		a.CheckDigit,
-		a.PIN,
-		a.Balance,
-		a.Status)
+func (db AccountRepositoryDB) FindAll(status string) ([]Account, *errs.AppError) {
+	var err error
+	accounts := make([]Account, 0)
 
-	if err != nil {
-		logger.Error("Error while creating new account: " + err.Error())
-		return nil, errs.NewUnexpectedError("Unexpected error from database")
+	if status == "" {
+		err = db.client.Select(&accounts, "SELECT * FROM account")
+	} else {
+		s, errParse := strconv.ParseBool(status)
+		if errParse != nil {
+			return nil, errs.NewInvalidParameterError("Parameter status " + status + " is invalid")
+		}
+		err = db.client.Select(&accounts, "SELECT * FROM account WHERE status = ?", s)
 	}
 
-	id, err := result.LastInsertId()
 	if err != nil {
-		logger.Error("Error while geting last insert id for new account: " + err.Error())
-		return nil, errs.NewUnexpectedError("Unexpected error from database")
+		logger.Error("Error while querying for accounts table: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
 
-	a.ID = strconv.FormatInt(id, 10)
+	return accounts, nil
+}
 
-	return &a, nil
+func (db AccountRepositoryDB) FindByID(id string) (*Account, *errs.AppError) {
+	var account Account
+
+	err := db.client.Get(&account, "SELECT * FROM account WHERE id =?", id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("Account not found")
+		} else {
+			logger.Error("Error while scanning account" + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected database error")
+		}
+	}
+
+	return &account, nil
 }
 
 func NewAccountRepositoryDB(dbClient *sqlx.DB) AccountRepositoryDB {

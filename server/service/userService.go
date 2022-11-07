@@ -55,7 +55,7 @@ func (s DefaultUserService) NewUser(user dto.UserRequest) (*dto.NewAccountRespon
 		return nil, err
 	}
 
-	response := account.ToDTO()
+	response := account.ToDTONewAccount()
 
 	return &response, nil
 }
