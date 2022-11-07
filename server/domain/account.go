@@ -21,14 +21,22 @@ type AccountRepository interface {
 	Save(Account) (*Account, *errs.AppError)
 }
 
-func (a Account) ToNewAccountResponseDTO() dto.NewAccountResponse {
-	return dto.NewAccountResponse{ID: a.ID}
-}
+func (a Account) Validate() *errs.AppError {
+	if a.Balance < 5000 {
+		return errs.NewValidationError("To open a new account, you need to deposit atleast 5000.00")
+	}
 
-func (a Account) ToDTO() dto.AccountResponse {
-	return dto.AccountResponse{}
+	return nil
 }
 
 func (a Account) CanWithdraw(value float64) bool {
 	return a.Balance >= value
+}
+
+func (a Account) ToDTO() dto.NewAccountResponse {
+	return dto.NewAccountResponse{
+		Agency:        a.Agency,
+		NumberAccount: a.Number,
+		CheckDigit:    a.CheckDigit,
+	}
 }

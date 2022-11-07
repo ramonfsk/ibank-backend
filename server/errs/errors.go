@@ -40,3 +40,10 @@ func NewValidationError(message string) *AppError {
 		Message: message,
 	}
 }
+
+func NewParseError(message string) *AppError {
+	return &AppError{
+		Code:    http.StatusInternalServerError,
+		Message: message,
+	}
+}

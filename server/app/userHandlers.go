@@ -1,10 +1,12 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
+	"github.ibm.com/rfnascimento/ibank/server/dto"
 	"github.ibm.com/rfnascimento/ibank/server/errs"
 	"github.ibm.com/rfnascimento/ibank/server/service"
 )
@@ -19,20 +21,14 @@ func (uh *UserHandler) getAllUsers(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadGateway, err.AsMessage())
 	} else {
-		if c.GetHeader("Content-Type") == "application/xml" {
-			c.Request.Header.Add("Content-Type", "application/xml")
-			c.XML(http.StatusOK, users)
-		} else {
-			c.Request.Header.Add("Content-Type", "application/json")
-			c.JSON(http.StatusOK, users)
-		}
+		c.JSON(http.StatusOK, users)
 	}
 }
 
 func (uh *UserHandler) getUser(c *gin.Context) {
 	regex, _ := regexp.Compile(`[0-9]+`)
 
-	id := c.Param("id")
+	id := c.Param("id_user")
 	if !regex.MatchString(id) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, (&errs.AppError{Message: "invalid id"}).AsMessage())
 	} else {
@@ -42,5 +38,19 @@ func (uh *UserHandler) getUser(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, user)
+	}
+}
+
+func (uh *UserHandler) newUser(c *gin.Context) {
+	var request dto.UserRequest
+	if err := json.NewDecoder(c.Request.Body).Decode(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+	} else {
+		user, appErr := uh.service.NewUser(request)
+		if appErr != nil {
+			c.AbortWithStatusJSON(appErr.Code, appErr.AsMessage())
+		} else {
+			c.JSON(http.StatusOK, user)
+		}
 	}
 }

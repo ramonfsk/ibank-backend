@@ -19,12 +19,17 @@ func Start() {
 	th := TransactionHandler{service: service.NewTransactionService(domain.NewTransactionRepositoryDB(dbClient))}
 	// define routes
 	router.GET("/users", uh.getAllUsers)
-	router.GET("/users/:id", uh.getUser)
-	router.POST("/users/:id/account", ah.newAccount)
-	router.POST("/transactions/*action", th.makeTransaction)
-	router.POST("/transactions", th.makeTransaction)
+	router.GET("/users/:id_user", uh.getUser)
+	router.POST("/users", uh.newUser)
+
+	router.GET("/accounts", ah.getAllAccounts)
+	router.GET("/accounts/:id_account", ah.getAccount)
+
+	router.GET("/transactions", th.getAllTransactions)
+	router.GET("/transactions/:id_account", th.getTransaction)
+	router.POST("/transactions", th.newTransaction)
 	// starting server
-	router.Run(":8000")
+	router.Run(":8010")
 }
 
 func getDBClient() *sqlx.DB {

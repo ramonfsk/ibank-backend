@@ -6,21 +6,21 @@ import (
 )
 
 type User struct {
-	ID        string
-	Name      string
-	Birthdate string
-	Password  string
-	Email     string
-	Document  string
-	City      string
-	Zipcode   string
-	Phone     string
-	Status    int
+	ID        string `db:"id"`
+	Name      string `db:"name"`
+	Birthdate string `db:"birthdate"`
+	Password  string `db:"password"`
+	Email     string `db:"email"`
+	Document  string `db:"document"`
+	Phone     string `db:"phone"`
+	Status    int    `db:"status"`
+	IsAdmin   bool   `db:"is_admin"`
 }
 
 type UserRepository interface {
 	FindAll(string) ([]User, *errs.AppError)
 	FindByID(string) (*User, *errs.AppError)
+	RegisterNewUser(dto.UserRequest, Account) (*Account, *errs.AppError)
 }
 
 const (
@@ -44,9 +44,8 @@ func (u User) ToDTO() dto.UserResponse {
 		Password:  u.Password,
 		Email:     u.Email,
 		Document:  u.Document,
-		City:      u.City,
-		Zipcode:   u.Zipcode,
 		Phone:     u.Phone,
 		Status:    u.statusAsText(),
+		IsAdmin:   u.IsAdmin,
 	}
 }
