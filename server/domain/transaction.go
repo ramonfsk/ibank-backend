@@ -2,9 +2,11 @@ package domain
 
 import (
 	"strings"
+	"time"
 
 	"github.ibm.com/rfnascimento/ibank/server/dto"
 	"github.ibm.com/rfnascimento/ibank/server/errs"
+	"github.ibm.com/rfnascimento/ibank/server/utils"
 )
 
 type Transaction struct {
@@ -12,7 +14,7 @@ type Transaction struct {
 	BankID     string  `db:"bank_id,omitempty"`
 	AccountID  string  `json:"account_id,omitempty"`
 	Agency     string  `db:"agency"`
-	Number     string  `db:"number"`
+	Number     string  `db:"account_number"`
 	CheckDigit string  `db:"check_digit"`
 	Type       string  `db:"type,omitempty"`
 	CreatedAt  string  `db:"created_at"`
@@ -20,20 +22,16 @@ type Transaction struct {
 }
 
 type TransactionRepository interface {
-	// GetByPeriod(string) ([]Transaction, *errs.AppError)
-	GetAllTransactionsByAccount(transaction Transaction) ([]Transaction, *errs.AppError)
-	SaveTransaction(transaction Transaction) (*Transaction, *errs.AppError)
-	FindAccount(string, string, string) (*Account, *errs.AppError)
+	FindAll() ([]Transaction, *errs.AppError)
+	FindByID(string) (*Transaction, *errs.AppError)
+	RegisterNewTransaction(Transaction) (*Transaction, *errs.AppError)
+	FindAccount(string) (*Account, *errs.AppError)
+	FindAccountWithoutID(string, string, string) (*Account, *errs.AppError)
 }
-
-const (
-	WITHDRAW = "withdraw"
-	DEPOSIT  = "deposit"
-)
 
 func (t Transaction) IsWithdrawal() bool {
 	s := strings.ToLower(t.Type)
-	return s == WITHDRAW
+	return s == utils.WITHDRAW
 }
 
 func (t Transaction) ToDTO() dto.TransactionResponse {
@@ -44,7 +42,7 @@ func (t Transaction) ToDTO() dto.TransactionResponse {
 		Number:     t.Number,
 		CheckDigit: t.CheckDigit,
 		Type:       t.Type,
-		CreatedAt:  t.CreatedAt,
+		CreatedAt:  time.Now().Format(time.RFC3339),
 		Value:      t.Value,
 	}
 }

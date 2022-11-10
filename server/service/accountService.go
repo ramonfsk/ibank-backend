@@ -9,6 +9,8 @@ import (
 type AccountService interface {
 	GetAllAccounts(status string) ([]dto.AccountResponse, *errs.AppError)
 	GetAccount(id string) (*dto.AccountResponse, *errs.AppError)
+	GetAllTransactionByAccount(string) ([]dto.TransactionResponse, *errs.AppError)
+	GetAllTransactionsByAccountWithPeriod(string, string, string) ([]dto.TransactionResponse, *errs.AppError)
 }
 
 type DefaultAccountService struct {
@@ -39,6 +41,38 @@ func (s DefaultAccountService) GetAccount(id string) (*dto.AccountResponse, *err
 	response := account.ToDTO()
 
 	return &response, nil
+}
+
+func (s DefaultAccountService) GetAllTransactionByAccount(id string) ([]dto.TransactionResponse, *errs.AppError) {
+	transactions, appErr := s.repo.FindAllTransactionsByID(id)
+	if appErr != nil {
+		return nil, appErr
+	} else if len(transactions) == 0 {
+		return nil, errs.NewValidationError("No have transactions for this account on database")
+	}
+
+	response := make([]dto.TransactionResponse, 0)
+	for _, transaction := range transactions {
+		response = append(response, transaction.ToDTO())
+	}
+
+	return response, nil
+}
+
+func (s DefaultAccountService) GetAllTransactionsByAccountWithPeriod(id string, startDate string, endDate string) ([]dto.TransactionResponse, *errs.AppError) {
+	transactions, appErr := s.repo.FindAllTransactionsByAccountIDWithPeriod(id, startDate, endDate)
+	if appErr != nil {
+		return nil, appErr
+	} else if len(transactions) == 0 {
+		return nil, errs.NewValidationError("No have transactions for this account on database")
+	}
+
+	response := make([]dto.TransactionResponse, 0)
+	for _, transaction := range transactions {
+		response = append(response, transaction.ToDTO())
+	}
+
+	return response, nil
 }
 
 func NewAccountService(repository domain.AccountRepository) DefaultAccountService {

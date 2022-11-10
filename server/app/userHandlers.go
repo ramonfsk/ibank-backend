@@ -9,6 +9,7 @@ import (
 	"github.ibm.com/rfnascimento/ibank/server/dto"
 	"github.ibm.com/rfnascimento/ibank/server/errs"
 	"github.ibm.com/rfnascimento/ibank/server/service"
+	"github.ibm.com/rfnascimento/ibank/server/utils"
 )
 
 type UserHandler struct {
@@ -26,15 +27,15 @@ func (uh *UserHandler) getAllUsers(c *gin.Context) {
 }
 
 func (uh *UserHandler) getUser(c *gin.Context) {
-	regex, _ := regexp.Compile(`[0-9]+`)
+	regex := regexp.MustCompile(utils.DIGITSONLYREGEX)
 
-	id := c.Param("id_user")
+	id := c.Param("id")
 	if !regex.MatchString(id) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, (&errs.AppError{Message: "invalid id"}).AsMessage())
 	} else {
 		user, err := uh.service.GetUser(id)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, err.AsMessage())
+			c.AbortWithStatusJSON(http.StatusBadGateway, err.AsMessage())
 		}
 
 		c.JSON(http.StatusOK, user)

@@ -43,7 +43,7 @@ CREATE TABLE `transaction` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `bank_id` int(11) NOT NULL,
   `agency` varchar(4) NOT NULL,
-  `number` varchar(8) NOT NULL,
+  `account_number` varchar(8) NOT NULL,
   `check_digit` varchar(1) NOT NULL,
   `type` varchar(16) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT NOW(),

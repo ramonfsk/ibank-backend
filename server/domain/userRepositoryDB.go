@@ -111,15 +111,14 @@ func (db UserRepositoryDB) RegisterNewUser(user dto.UserRequest, generatedAccoun
 		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
 
-	idAccount, err := resultInsertAccount.LastInsertId()
+	accountId, err := resultInsertAccount.LastInsertId()
 	if err != nil {
 		logger.Error("Error while geting last insert id for new account: " + err.Error())
 		return nil, errs.NewUnexpectedError("Unexpected error from database")
 	}
 
-	logger.Info("Created new account: " + strconv.FormatInt(idAccount, 10))
-
 	return &Account{
+		ID:         strconv.FormatInt(accountId, 10),
 		Agency:     generatedAccount.Agency,
 		Number:     generatedAccount.Number,
 		CheckDigit: generatedAccount.CheckDigit,

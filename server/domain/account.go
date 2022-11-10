@@ -21,6 +21,8 @@ type Account struct {
 type AccountRepository interface {
 	FindAll(string) ([]Account, *errs.AppError)
 	FindByID(string) (*Account, *errs.AppError)
+	FindAllTransactionsByID(string) ([]Transaction, *errs.AppError)
+	FindAllTransactionsByAccountIDWithPeriod(string, string, string) ([]Transaction, *errs.AppError)
 }
 
 func (a Account) Validate() *errs.AppError {
@@ -51,6 +53,7 @@ func (a Account) ToDTO() dto.AccountResponse {
 
 func (a Account) ToDTONewAccount() dto.NewAccountResponse {
 	return dto.NewAccountResponse{
+		ID:            a.ID,
 		Agency:        a.Agency,
 		NumberAccount: a.Number,
 		CheckDigit:    a.CheckDigit,

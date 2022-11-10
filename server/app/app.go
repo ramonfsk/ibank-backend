@@ -19,14 +19,16 @@ func Start() {
 	th := TransactionHandler{service: service.NewTransactionService(domain.NewTransactionRepositoryDB(dbClient))}
 	// define routes
 	router.GET("/users", uh.getAllUsers)
-	router.GET("/users/:id_user", uh.getUser)
+	router.GET("/users/:id", uh.getUser)
 	router.POST("/users", uh.newUser)
 
 	router.GET("/accounts", ah.getAllAccounts)
-	router.GET("/accounts/:id_account", ah.getAccount)
+	router.GET("/accounts/:id", ah.getAccount)
+	router.GET("/accounts/:id/transactions", ah.getAllTransactionAccount)
+	router.GET("/accounts/:id/transactionswithperiod", ah.getAllTransactionAccountWithPeriod)
 
 	router.GET("/transactions", th.getAllTransactions)
-	router.GET("/transactions/:id_account", th.getTransaction)
+	router.GET("/transactions/:id", th.getTransaction)
 	router.POST("/transactions", th.newTransaction)
 	// starting server
 	router.Run(":8010")

@@ -38,7 +38,7 @@ func (db AccountRepositoryDB) FindAll(status string) ([]Account, *errs.AppError)
 func (db AccountRepositoryDB) FindByID(id string) (*Account, *errs.AppError) {
 	var account Account
 
-	err := db.client.Get(&account, "SELECT * FROM account WHERE id =?", id)
+	err := db.client.Get(&account, "SELECT * FROM account WHERE id = ?", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("Account not found")
@@ -49,6 +49,52 @@ func (db AccountRepositoryDB) FindByID(id string) (*Account, *errs.AppError) {
 	}
 
 	return &account, nil
+}
+
+func (db AccountRepositoryDB) FindAllTransactionsByID(id string) ([]Transaction, *errs.AppError) {
+	var err error
+	transactions := make([]Transaction, 0)
+
+	account, appErr := db.FindByID(id)
+	if appErr != nil {
+		return transactions, appErr
+	}
+
+	err = db.client.Select(&transactions,
+		`SELECT * FROM transaction WHERE agency = ? AND account_number = ? AND check_digit = ?`,
+		account.Agency,
+		account.Number,
+		account.CheckDigit)
+	if err != nil {
+		logger.Error("Error while querying for transactions table: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	return transactions, nil
+}
+
+func (db AccountRepositoryDB) FindAllTransactionsByAccountIDWithPeriod(id string, startDate string, endDate string) ([]Transaction, *errs.AppError) {
+	var err error
+	transactions := make([]Transaction, 0)
+
+	account, appErr := db.FindByID(id)
+	if appErr != nil {
+		return transactions, appErr
+	}
+
+	err = db.client.Select(&transactions,
+		`SELECT * FROM transaction WHERE agency = ? AND account_number = ? AND check_digit = ? AND created_at BETWEEN ? AND ?`,
+		account.Agency,
+		account.Number,
+		account.CheckDigit,
+		startDate+" 00:00:00",
+		endDate+" 23:59:00")
+	if err != nil {
+		logger.Error("Error while querying for transactions table: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	return transactions, nil
 }
 
 func NewAccountRepositoryDB(dbClient *sqlx.DB) AccountRepositoryDB {

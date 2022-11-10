@@ -14,18 +14,12 @@ type TransactionRepositoryDB struct {
 	client *sqlx.DB
 }
 
-// func (d TransactionRepositoryDB) GetByPeriod(days int) ([]Transaction, *errs.AppError) {}
-
-func (d TransactionRepositoryDB) GetAllTransactionsByAccount(t Transaction) ([]Transaction, *errs.AppError) {
+func (db TransactionRepositoryDB) FindAll() ([]Transaction, *errs.AppError) {
 	var err error
 	transactions := make([]Transaction, 0)
 
-	err = d.client.Select(&transactions,
-		`SELECT * FROM transaction WHERE agency = ? AND number = ? AND check_digit = ?`,
-		t.Agency,
-		t.Number,
-		t.CheckDigit)
-
+	err = db.client.Select(&transactions,
+		`SELECT * FROM transaction`)
 	if err != nil {
 		logger.Error("Error while querying for transactions table: " + err.Error())
 		return nil, errs.NewUnexpectedError("Unexpected database error")
@@ -34,15 +28,62 @@ func (d TransactionRepositoryDB) GetAllTransactionsByAccount(t Transaction) ([]T
 	return transactions, nil
 }
 
-func (d TransactionRepositoryDB) SaveTransaction(t Transaction) (*Transaction, *errs.AppError) {
+func (db TransactionRepositoryDB) FindByID(id string) (*Transaction, *errs.AppError) {
+	var transaction Transaction
+
+	err := db.client.Get(&transaction, "SELECT * FROM transaction WHERE id =?", id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("Transaction not found")
+		} else {
+			logger.Error("Error while scanning transaction" + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected database error")
+		}
+	}
+
+	return &transaction, nil
+}
+
+func (db TransactionRepositoryDB) FindAllByAccountID(accountId string) ([]Transaction, *errs.AppError) {
+	var err error
+	transactions := make([]Transaction, 0)
+
+	err = db.client.Select(&transactions,
+		`SELECT * FROM transaction WHERE account_id = ?`, accountId)
+	if err != nil {
+		logger.Error("Error while querying for transactions table: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	return transactions, nil
+}
+
+func (db TransactionRepositoryDB) FindAllByAccountIDWithPeriod(accountId string, startDate string, endDate string) ([]Transaction, *errs.AppError) {
+	var err error
+	transactions := make([]Transaction, 0)
+
+	err = db.client.Select(&transactions,
+		`SELECT * FROM transaction WHERE account_id = ? AND created_at BETWEEN ? AND ?`,
+		accountId,
+		startDate,
+		endDate)
+	if err != nil {
+		logger.Error("Error while querying for transactions table: " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
+	}
+
+	return transactions, nil
+}
+
+func (db TransactionRepositoryDB) RegisterNewTransaction(t Transaction) (*Transaction, *errs.AppError) {
 	// staring the database transaction
-	tx, err := d.client.Begin()
+	tx, err := db.client.Begin()
 	if err != nil {
 		logger.Error("Error while starting a new transaction for bank account:" + err.Error())
 		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
 	// insert bank transaction
-	result, _ := tx.Exec(`INSERT INTO transaction (bank_id, agency, number, check_digit, type, value)
+	result, _ := tx.Exec(`INSERT INTO transaction (bank_id, agency, account_number, check_digit, type, value)
 		VALUES (?, ?, ?, ?, ?, ?)`,
 		t.BankID,
 		t.Agency,
@@ -75,22 +116,33 @@ func (d TransactionRepositoryDB) SaveTransaction(t Transaction) (*Transaction, *
 		logger.Error("Error while getting the last transaction ID: " + err.Error())
 		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
-	// getting account information from the accounts table
-	account, appErr := d.FindAccount(t.Agency, t.Number, t.CheckDigit)
-	if appErr != nil {
-		return nil, appErr
-	}
 
 	t.ID = strconv.FormatInt(transactionID, 10)
-	// updating the transaction struct with the last balance
-	t.Value = account.Balance
+
 	return &t, nil
 }
 
-func (d TransactionRepositoryDB) FindAccount(agency string, number string, checkDigit string) (*Account, *errs.AppError) {
+func (db TransactionRepositoryDB) FindAccount(accountId string) (*Account, *errs.AppError) {
 	var account Account
 
-	err := d.client.Get(&account,
+	err := db.client.Get(&account,
+		`SELECT * FROM account WHERE id = ?`, accountId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("Account not found")
+		} else {
+			logger.Error("Error while scanning account" + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected database error")
+		}
+	}
+
+	return &account, nil
+}
+
+func (db TransactionRepositoryDB) FindAccountWithoutID(agency string, number string, checkDigit string) (*Account, *errs.AppError) {
+	var account Account
+
+	err := db.client.Get(&account,
 		`SELECT * FROM account WHERE agency = ? AND number = ? AND check_digit = ?`,
 		agency,
 		number,
@@ -108,7 +160,5 @@ func (d TransactionRepositoryDB) FindAccount(agency string, number string, check
 }
 
 func NewTransactionRepositoryDB(dbClient *sqlx.DB) TransactionRepositoryDB {
-	return TransactionRepositoryDB{
-		client: dbClient,
-	}
+	return TransactionRepositoryDB{client: dbClient}
 }

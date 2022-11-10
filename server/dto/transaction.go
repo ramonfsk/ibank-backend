@@ -6,19 +6,13 @@ import (
 	"strings"
 
 	"github.ibm.com/rfnascimento/ibank/server/errs"
+	"github.ibm.com/rfnascimento/ibank/server/utils"
 )
 
-const (
-	WITHDRAW = "withdraw"
-	DEPOSIT  = "deposit"
-	CHECK    = "check"
-	TRANSFER = "transfer"
-)
-
-type TransactionRequest struct {
+type NewTransactionRequest struct {
 	BankID     string  `json:"bank_id,omitempty"`
 	Agency     string  `json:"agency"`
-	Number     string  `json:"number"`
+	Number     string  `json:"account_number"`
 	CheckDigit string  `json:"check_digit"`
 	Type       string  `json:"type"`
 	Value      float64 `json:"value"`
@@ -28,31 +22,31 @@ type TransactionResponse struct {
 	ID         string  `json:"id,omitempty"`
 	BankID     string  `json:"bank_id,omitempty"`
 	Agency     string  `json:"agency"`
-	Number     string  `json:"number"`
+	Number     string  `json:"account_number"`
 	CheckDigit string  `json:"check_digit"`
 	Type       string  `json:"type"`
 	CreatedAt  string  `json:"created_at"`
 	Value      float64 `json:"value"`
 }
 
-func (t TransactionRequest) IsTransactionTypeWithdrawal() bool {
+func (t NewTransactionRequest) IsTransactionTypeWithdrawal() bool {
 	s := strings.ToLower(t.Type)
-	return s == WITHDRAW
+	return s == utils.WITHDRAW
 }
 
-func (t TransactionRequest) ValidateMakeTransaction() *errs.AppError {
+func (t NewTransactionRequest) ValidateMakeTransaction() *errs.AppError {
 	typeErr := t.IsValidType()
-	accountAgencyErr := t.IsValidAccountAgency()
-	accountNumberErr := t.IsValidAccountNumber()
-	accountCheckDigitErr := t.IsValidAccountCheckDigit()
+	accountAgencyErr := t.IsValaccountIdAgency()
+	accountNumberErr := t.IsValaccountIdNumber()
+	accountCheckDigitErr := t.IsValaccountIdCheckDigit()
 	valueErr := t.IsValidValue()
 	if typeErr != nil {
 		return typeErr
-	} else if t.IsValidAccountAgency() != nil {
+	} else if t.IsValaccountIdAgency() != nil {
 		return accountAgencyErr
-	} else if t.IsValidAccountNumber() != nil {
+	} else if t.IsValaccountIdNumber() != nil {
 		return accountNumberErr
-	} else if t.IsValidAccountCheckDigit() != nil {
+	} else if t.IsValaccountIdCheckDigit() != nil {
 		return accountCheckDigitErr
 	} else if t.IsValidValue() != nil {
 		return valueErr
@@ -61,38 +55,38 @@ func (t TransactionRequest) ValidateMakeTransaction() *errs.AppError {
 	return nil
 }
 
-func (t TransactionRequest) ValidateGetAllTransactions() *errs.AppError {
-	accountAgencyErr := t.IsValidAccountAgency()
-	accountNumberErr := t.IsValidAccountNumber()
-	accountCheckDigitErr := t.IsValidAccountCheckDigit()
-	if t.IsValidAccountAgency() != nil {
+func (t NewTransactionRequest) ValidateGetAllTransactions() *errs.AppError {
+	accountAgencyErr := t.IsValaccountIdAgency()
+	accountNumberErr := t.IsValaccountIdNumber()
+	accountCheckDigitErr := t.IsValaccountIdCheckDigit()
+	if t.IsValaccountIdAgency() != nil {
 		return accountAgencyErr
-	} else if t.IsValidAccountNumber() != nil {
+	} else if t.IsValaccountIdNumber() != nil {
 		return accountNumberErr
-	} else if t.IsValidAccountCheckDigit() != nil {
+	} else if t.IsValaccountIdCheckDigit() != nil {
 		return accountCheckDigitErr
 	}
 
 	return nil
 }
 
-func (t TransactionRequest) IsValidType() *errs.AppError {
+func (t NewTransactionRequest) IsValidType() *errs.AppError {
 	s := strings.ToLower(t.Type)
 	switch s {
-	case WITHDRAW:
+	case utils.WITHDRAW:
 		return nil
-	case DEPOSIT:
+	case utils.DEPOSIT:
 		return nil
-	case CHECK:
+	case utils.CHECK:
 		return nil
-	case TRANSFER:
+	case utils.TRANSFER:
 		return nil
 	default:
 		return errs.NewValidationError("Type" + t.Type + " of transaction is invalid!")
 	}
 }
 
-func (t TransactionRequest) IsValidAccountAgency() *errs.AppError {
+func (t NewTransactionRequest) IsValaccountIdAgency() *errs.AppError {
 	regex, _ := regexp.Compile(`[0-9]+`)
 
 	if !regex.MatchString(t.Agency) {
@@ -102,7 +96,7 @@ func (t TransactionRequest) IsValidAccountAgency() *errs.AppError {
 	return nil
 }
 
-func (t TransactionRequest) IsValidAccountNumber() *errs.AppError {
+func (t NewTransactionRequest) IsValaccountIdNumber() *errs.AppError {
 	regex, _ := regexp.Compile(`[0-9]+`)
 
 	if !regex.MatchString(t.Number) {
@@ -112,7 +106,7 @@ func (t TransactionRequest) IsValidAccountNumber() *errs.AppError {
 	return nil
 }
 
-func (t TransactionRequest) IsValidAccountCheckDigit() *errs.AppError {
+func (t NewTransactionRequest) IsValaccountIdCheckDigit() *errs.AppError {
 	regex, _ := regexp.Compile(`[0-9]+`)
 
 	if !regex.MatchString(t.CheckDigit) {
@@ -122,7 +116,7 @@ func (t TransactionRequest) IsValidAccountCheckDigit() *errs.AppError {
 	return nil
 }
 
-func (t TransactionRequest) IsValidValue() *errs.AppError {
+func (t NewTransactionRequest) IsValidValue() *errs.AppError {
 	if t.Value < 0.01 {
 		return errs.NewValidationError(fmt.Sprintf("Value R$ %.2f of transaction is invalid!", t.Value))
 	}

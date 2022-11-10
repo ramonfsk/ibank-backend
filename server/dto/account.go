@@ -13,7 +13,7 @@ type AccountResponse struct {
 }
 
 type NewAccountResponse struct {
-	ID            string `json:"id_account,omitempty"`
+	ID            string `json:"account_id,omitempty"`
 	Agency        string `json:"agency"`
 	NumberAccount string `json:"number_account"`
 	CheckDigit    string `json:"check_digit"`
