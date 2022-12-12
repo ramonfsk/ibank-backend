@@ -7,13 +7,13 @@ func Start() {
 
 	authRepository := domain.NewAuthRepository(getDBClient())
 
-	ah := AuthHandler{service: service.NewLoginService(authRepository, domain.GetRolePermission()}
+	ah := AuthHandler{service: service.NewLoginService(authRepository, domain.GetRolePermissions()}
 
 	router.POST("/auth/login", ah.Login)
 	router.POST("/auth/register", ah.NotImplementedHanlder)
 	router.GET("/auth/verify", ah.Verify)
 
-	router.Run(":8001")
+	router.Run(":8011")
 }
 
 func getDBClient() *sqlx.DB {
