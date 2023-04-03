@@ -3,8 +3,8 @@ package domain
 import (
 	"time"
 
-	"github.ibm.com/rfnascimento/ibank/server/dto"
-	"github.ibm.com/rfnascimento/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/dto"
+	"github.com/ramonfsk/ibank/server/errs"
 )
 
 type TransactionRepositoryStub struct {

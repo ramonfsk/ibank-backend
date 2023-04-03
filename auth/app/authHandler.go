@@ -15,7 +15,7 @@ type AuthHandler struct {
 }
 
 func (ah *AuthHandler) NotImplementedHanlder(c *gin.Context) {
-	fmt.Fprint(c, "Hanlder not implemented...")
+	fmt.Fprint(nil, "Hanlder not implemented...")
 }
 
 func (ah *AuthHandler) Login(c *gin.Context) {
@@ -26,6 +26,8 @@ func (ah *AuthHandler) Login(c *gin.Context) {
 		token, err := ah.service.Login(loginRequest)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, err.AsMessage())
+		} else {
+			c.JSON(http.StatusOK, token)
 		}
 	}
 }

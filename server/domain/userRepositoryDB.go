@@ -6,10 +6,10 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.ibm.com/rfnascimento/ibank/server/dto"
-	"github.ibm.com/rfnascimento/ibank/server/errs"
-	"github.ibm.com/rfnascimento/ibank/server/logger"
-	"github.ibm.com/rfnascimento/ibank/server/utils"
+	"github.com/ramonfsk/ibank/server/dto"
+	"github.com/ramonfsk/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/logger"
+	"github.com/ramonfsk/ibank/server/utils"
 )
 
 type UserRepositoryDB struct {

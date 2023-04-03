@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.ibm.com/rfnascimento/ibank/server/errs"
-	"github.ibm.com/rfnascimento/ibank/server/utils"
+	"github.com/ramonfsk/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/utils"
 )
 
 type NewTransactionRequest struct {

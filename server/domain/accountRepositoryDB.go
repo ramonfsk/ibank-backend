@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
-	"github.ibm.com/rfnascimento/ibank/server/errs"
-	"github.ibm.com/rfnascimento/ibank/server/logger"
+	"github.com/ramonfsk/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/logger"
 )
 
 type AccountRepositoryDB struct {

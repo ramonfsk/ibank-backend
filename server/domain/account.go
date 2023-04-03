@@ -1,9 +1,9 @@
 package domain
 
 import (
-	"github.ibm.com/rfnascimento/ibank/server/dto"
-	"github.ibm.com/rfnascimento/ibank/server/errs"
-	"github.ibm.com/rfnascimento/ibank/server/utils"
+	"github.com/ramonfsk/ibank/server/dto"
+	"github.com/ramonfsk/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/utils"
 )
 
 type Account struct {

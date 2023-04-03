@@ -5,11 +5,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.ibm.com/rfnascimento/ibank/server/domain"
-	"github.ibm.com/rfnascimento/ibank/server/dto"
-	"github.ibm.com/rfnascimento/ibank/server/errs"
+	"github.com/ramonfsk/ibank/server/domain"
+	"github.com/ramonfsk/ibank/server/dto"
+	"github.com/ramonfsk/ibank/server/errs"
 )
 
+//go:generate mockgen -destination=../mocks/service/mockUserService.go -package=service github.com/ramonfsk/ibank/server/service UserService
 type UserService interface {
 	GetAllUsers(status string) ([]dto.UserResponse, *errs.AppError)
 	GetUser(id string) (*dto.UserResponse, *errs.AppError)
