@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ramonfsk/ibank/server/utils"
+	"github.com/ramonfsk/ibank-backend/server/utils"
 )
 
 func TestSholdReturnErrorWhenTransactionTypeIsNotDepositOrWithdrawl(t *testing.T) {

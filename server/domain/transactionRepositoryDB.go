@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/ramonfsk/ibank/server/errs"
-	"github.com/ramonfsk/ibank/server/logger"
+	"github.com/ramonfsk/ibank-backend/server/errs"
+	"github.com/ramonfsk/ibank-backend/server/logger"
 )
 
 type TransactionRepositoryDB struct {

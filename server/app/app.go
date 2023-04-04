@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	"github.com/ramonfsk/ibank/server/domain"
-	"github.com/ramonfsk/ibank/server/service"
+	"github.com/ramonfsk/ibank-backend/server/domain"
+	"github.com/ramonfsk/ibank-backend/server/service"
 )
 
 func Start() {

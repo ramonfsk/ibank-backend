@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/ramonfsk/ibank/server/domain"
-	"github.com/ramonfsk/ibank/server/dto"
-	"github.com/ramonfsk/ibank/server/errs"
+	"github.com/ramonfsk/ibank-backend/server/domain"
+	"github.com/ramonfsk/ibank-backend/server/dto"
+	"github.com/ramonfsk/ibank-backend/server/errs"
 )
 
 type TransactionService interface {

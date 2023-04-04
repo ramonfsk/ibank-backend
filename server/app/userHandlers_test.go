@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/ramonfsk/ibank/server/dto"
-	"github.com/ramonfsk/ibank/server/errs"
-	"github.com/ramonfsk/ibank/server/mocks/service"
+	"github.com/ramonfsk/ibank-backend/server/dto"
+	"github.com/ramonfsk/ibank-backend/server/errs"
+	"github.com/ramonfsk/ibank-backend/server/mocks/service"
 )
 
 var router *gin.Engine

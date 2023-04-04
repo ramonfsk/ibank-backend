@@ -5,9 +5,9 @@ import (
 	"regexp"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ramonfsk/ibank/server/errs"
-	"github.com/ramonfsk/ibank/server/service"
-	"github.com/ramonfsk/ibank/server/utils"
+	"github.com/ramonfsk/ibank-backend/server/errs"
+	"github.com/ramonfsk/ibank-backend/server/service"
+	"github.com/ramonfsk/ibank-backend/server/utils"
 )
 
 type AccountHandler struct {

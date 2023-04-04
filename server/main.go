@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ramonfsk/ibank/server/app"
-	"github.com/ramonfsk/ibank/server/logger"
+	"github.com/ramonfsk/ibank-backend/server/app"
+	"github.com/ramonfsk/ibank-backend/server/logger"
 )
 
 func main() {

@@ -17,7 +17,7 @@ type Login struct {
 }
 
 func (l Login) GenerateToken() (*string, errs.AppError) {
-	var claims jwt.ClaimsFactory
+	var claims 
 	if l.isAdmin {
 		claims = l.claimsForAdmin()
 	} else {
@@ -28,7 +28,7 @@ func (l Login) GenerateToken() (*string, errs.AppError) {
 }
 
 func (l Login) claimsForAdmin() jwt.ClaimsFactory {
-	return &jwt.ClaimsFactory{
+	return &jwt.ClaimsFactory {
 		"email": l.Email,
 		"exp":   time.Now().Add(TOKEN_DURATION).Unix(),
 	}
