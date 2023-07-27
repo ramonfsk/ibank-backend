@@ -1,16 +1,25 @@
 package app
 
+import (
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
+	"github.com/ramonfsk/ibank-backend/auth/domain"
+	"github.com/ramonfsk/ibank-backend/auth/service"
+)
+
 func Start() {
 	sanityCheck()
 
 	router := gin.Default()
 
-	authRepository := domain.NewAuthRepository(getDBClient())
+	dbClient := getDBClient()
 
-	ah := AuthHandler{service: service.NewLoginService(authRepository, domain.GetRolePermissions()}
+	ah := AuthHandler{service: service.NewAuthService(domain.NewAuthRepositoryDB(dbClient))}
 
 	router.POST("/auth/login", ah.Login)
-	router.POST("/auth/register", ah.NotImplementedHanlder)
+	router.POST("/auth/register", ah.Register)
 	router.GET("/auth/verify", ah.Verify)
 
 	router.Run(":8011")
@@ -30,5 +39,5 @@ func getDBClient() *sqlx.DB {
 }
 
 func sanityCheck() {
-	
+
 }

@@ -1,6 +1,6 @@
 package main
 
-import "github.ibm.com/rfnascimento/ibank/auth/app"
+import "github.com/ramonfsk/ibank-backend/auth/app"
 
 func main() {
 	app.Start()

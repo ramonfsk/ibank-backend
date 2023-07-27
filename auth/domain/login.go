@@ -1,35 +1,45 @@
 package domain
 
 import (
-	"database/sql"
+	"os"
 	"time"
 
-	"github.com/go-kit/kit/auth/jwt"
-	"github.ibm.com/rfnascimento/ibank/auth/errs"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/ramonfsk/ibank-backend/auth/errs"
 )
 
 const TOKEN_DURATION = time.Hour
 
-type Login struct {
-	ID      sql.NullInt64 `db:"id"`
-	Email   string        `db:"email"`
-	isAdmin bool          `db:"is_admin"`
+type JWTData struct {
+	jwt.RegisteredClaims
+	CustomClaims map[string]string `json:"custom_claims"`
 }
 
-func (l Login) GenerateToken() (*string, errs.AppError) {
-	var claims 
-	if l.isAdmin {
-		claims = l.claimsForAdmin()
-	} else {
-		claims = l.claimsForUser()
+func (u User) GenerateToken() (*string, *errs.AppError) {
+	claims := JWTData{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(TOKEN_DURATION))),
+		},
+		CustomClaims: map[string]string{
+			"id":       u.ID,
+			"email":    u.Email,
+			"password": u.Password,
+		},
 	}
 
-	return token, nil
-}
+	tokenString := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-func (l Login) claimsForAdmin() jwt.ClaimsFactory {
-	return &jwt.ClaimsFactory {
-		"email": l.Email,
-		"exp":   time.Now().Add(TOKEN_DURATION).Unix(),
+	var hmacSecrecKey []byte
+
+	if keyData, err := os.ReadFile("secret/hmacSecretKey"); err == nil {
+		hmacSecrecKey = keyData
+	} else {
+		return nil, errs.NewReadingEnvironmentFileError(err.Error())
+	}
+
+	if signedTokenAsString, err := tokenString.SignedString(hmacSecrecKey); err != nil {
+		return nil, errs.NewInvalidCredentialsError(err.Error())
+	} else {
+		return &signedTokenAsString, nil
 	}
 }

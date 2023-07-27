@@ -1,17 +1,29 @@
 version: "3"
 
 services:
-  mysql:
+  db:
     image: mysql
     ports:
-      - "3306:3306"
+      - 3306:3306
     volumes:
       - ./mysqldata:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
-    container_name: mysql
+    container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: root
       TZ: America/Sao_Paulo
+
+  ibank-server:
+    image: ramonfsk/ibank-server
+    ports:
+      - 8010:8010
+    container_name: ibank-server
+
+  # ibank-auth:
+  #   image: ibank-auth
+  #   ports:
+  #     - 8011:8011
+  #   container_name: ibank-auth
 
 volumes:
   mysqldata:

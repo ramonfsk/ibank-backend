@@ -6,28 +6,32 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.ibm.com/rfnascimento/ibank/auth/dto"
-	"github.ibm.com/rfnascimento/ibank/auth/service"
+	"github.com/ramonfsk/ibank-backend/auth/dto"
+	"github.com/ramonfsk/ibank-backend/auth/service"
 )
 
 type AuthHandler struct {
 	service service.AuthService
 }
 
-func (ah *AuthHandler) NotImplementedHanlder(c *gin.Context) {
-	fmt.Fprint(nil, "Hanlder not implemented...")
-}
-
 func (ah *AuthHandler) Login(c *gin.Context) {
 	var loginRequest dto.LoginRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&loginRequest); err != nil {
-
+		c.AbortWithStatus(http.StatusBadRequest)
 	} else {
 		token, err := ah.service.Login(loginRequest)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, err.AsMessage())
+			c.AbortWithStatusJSON(err.Code, err.AsMessage())
 		} else {
 			c.JSON(http.StatusOK, token)
 		}
 	}
+}
+
+func (ah *AuthHandler) Register(c *gin.Context) {
+	fmt.Fprint(nil, "Register not implemented yet...")
+}
+
+func (ah *AuthHandler) Verify(c *gin.Context) {
+	fmt.Fprint(nil, "Verify not implemented yet...")
 }

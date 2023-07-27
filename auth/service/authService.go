@@ -1,21 +1,21 @@
 package service
 
 import (
-	"github.ibm.com/rfnascimento/ibank/auth/dto"
-	"github.ibm.com/rfnascimento/ibank/auth/errs"
+	"github.com/ramonfsk/ibank-backend/auth/domain"
+	"github.com/ramonfsk/ibank-backend/auth/dto"
+	"github.com/ramonfsk/ibank-backend/auth/errs"
 )
 
 type DefaultAuthService struct {
-	repository      domain.AuthRepository
-	rolePermissions domain.RolePermissions
+	repository domain.AuthRepository
 }
 
 type AuthService interface {
-	Login(dto.LoginRequest) (*string, *errs.AppError)
-	Verify(urlParams map[string]string) (bool, error)
+	Login(dto.LoginRequest) (*dto.AuthTokenResponse, *errs.AppError)
+	Verify(urlParams map[string]string) (bool, *errs.AppError)
 }
 
-func (s DefaultAuthService) Login(request dto.LoginRequest) (*string, *errs.AppError) {
+func (s DefaultAuthService) Login(request dto.LoginRequest) (*dto.AuthTokenResponse, *errs.AppError) {
 	login, err := s.repository.FindBy(request.Username, request.Password)
 	if err != nil {
 		return nil, err
@@ -26,5 +26,15 @@ func (s DefaultAuthService) Login(request dto.LoginRequest) (*string, *errs.AppE
 		return nil, err
 	}
 
-	return token
+	return &dto.AuthTokenResponse{
+		Token: *token,
+	}, nil
+}
+
+func (s DefaultAuthService) Verify(urlParams map[string]string) (bool, *errs.AppError) {
+	return true, nil
+}
+
+func NewAuthService(repository domain.AuthRepository) DefaultAuthService {
+	return DefaultAuthService{repository: repository}
 }
