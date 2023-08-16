@@ -47,3 +47,24 @@ func NewParseError(message string) *AppError {
 		Message: message,
 	}
 }
+
+func NewBuildRequestError(message string) *AppError {
+	return &AppError{
+		Code:    http.StatusInternalServerError,
+		Message: message,
+	}
+}
+
+func NewEncodeBodyError(message string) *AppError {
+	return &AppError{
+		Code:    http.StatusInternalServerError,
+		Message: message,
+	}
+}
+
+func NewSendRequestError(message string) *AppError {
+	return &AppError{
+		Code:    http.StatusInternalServerError,
+		Message: message,
+	}
+}

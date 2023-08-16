@@ -11,11 +11,11 @@ type DefaultAuthService struct {
 }
 
 type AuthService interface {
-	Login(dto.LoginRequest) (*dto.AuthTokenResponse, *errs.AppError)
+	Login(dto.LoginRequest) (*dto.TokenResponse, *errs.AppError)
 	Verify(urlParams map[string]string) (bool, *errs.AppError)
 }
 
-func (s DefaultAuthService) Login(request dto.LoginRequest) (*dto.AuthTokenResponse, *errs.AppError) {
+func (s DefaultAuthService) Login(request dto.LoginRequest) (*dto.TokenResponse, *errs.AppError) {
 	login, err := s.repository.FindBy(request.Username, request.Password)
 	if err != nil {
 		return nil, err
@@ -26,11 +26,13 @@ func (s DefaultAuthService) Login(request dto.LoginRequest) (*dto.AuthTokenRespo
 		return nil, err
 	}
 
-	return &dto.AuthTokenResponse{
+	return &dto.TokenResponse{
 		Token: *token,
 	}, nil
 }
 
+// Sample URL String
+// auth/verify?token=aaa.bbbb.cccc&routeName=getAllUsers
 func (s DefaultAuthService) Verify(urlParams map[string]string) (bool, *errs.AppError) {
 	return true, nil
 }

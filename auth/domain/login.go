@@ -2,6 +2,7 @@ package domain
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -24,6 +25,7 @@ func (u User) GenerateToken() (*string, *errs.AppError) {
 			"id":       u.ID,
 			"email":    u.Email,
 			"password": u.Password,
+			"isAdmin":  strconv.FormatBool(u.IsAdmin),
 		},
 	}
 

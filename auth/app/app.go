@@ -12,17 +12,19 @@ import (
 func Start() {
 	sanityCheck()
 
-	router := gin.Default()
+	engine := gin.Default()
 
 	dbClient := getDBClient()
 
 	ah := AuthHandler{service: service.NewAuthService(domain.NewAuthRepositoryDB(dbClient))}
 
-	router.POST("/auth/login", ah.Login)
-	router.POST("/auth/register", ah.Register)
-	router.GET("/auth/verify", ah.Verify)
+	versionGroup := engine.Group("/v1")
+	{
+		versionGroup.POST("/auth/login", ah.Login)
+		versionGroup.POST("/auth/verify", ah.Verify)
+	}
 
-	router.Run(":8011")
+	engine.Run(":8011")
 }
 
 func getDBClient() *sqlx.DB {

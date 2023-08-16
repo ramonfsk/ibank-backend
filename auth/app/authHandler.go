@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,10 +27,11 @@ func (ah *AuthHandler) Login(c *gin.Context) {
 	}
 }
 
-func (ah *AuthHandler) Register(c *gin.Context) {
-	fmt.Fprint(nil, "Register not implemented yet...")
-}
-
 func (ah *AuthHandler) Verify(c *gin.Context) {
-	fmt.Fprint(nil, "Verify not implemented yet...")
+	var authRequest dto.AuthRequest
+	if err := json.NewDecoder(c.Request.Body).Decode(&authRequest); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+	} else {
+		c.JSON(200, gin.H{"isAuthorized": true})
+	}
 }
