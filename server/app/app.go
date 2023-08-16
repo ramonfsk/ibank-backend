@@ -66,18 +66,14 @@ func buildEngine() http.Handler {
 func buildAdminEngine() http.Handler {
 	engine := gin.Default()
 	// wiring
-	authHandler, uh, ah, th := configureHandlers()
+	_, uh, ah, th := configureHandlers()
 	// version group
 	versionGroup := engine.Group("/v1")
 	{
-		// auth group middleware
-		authGroupMiddleware := engine.Group(versionGroup.BasePath()).Use(authHandler.authorizationMiddlewareHandler)
-		{
-			// define admin routes
-			authGroupMiddleware.GET("/users", uh.getAllUsers)
-			authGroupMiddleware.GET("/accounts", ah.getAllAccounts)
-			authGroupMiddleware.GET("/transactions", th.getAllTransactions)
-		}
+		// define admin routes
+		versionGroup.GET("/users", uh.getAllUsers)
+		versionGroup.GET("/accounts", ah.getAllAccounts)
+		versionGroup.GET("/transactions", th.getAllTransactions)
 	}
 
 	return engine
